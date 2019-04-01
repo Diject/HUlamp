@@ -1,0 +1,22 @@
+----------------------------------------------------------------------------------------------------------------------------------
+NCDrill File Report For: WirelessLamp.PcbDoc   01.04.2019  23:06:18
+----------------------------------------------------------------------------------------------------------------------------------
+
+Layer Pair : Top Layer to Bottom Layer
+ASCII RoundHoles File : WirelessLamp.TXT
+
+Tool       Hole Size               Hole Tolerance               Hole Type       Hole Count   Plated         Tool Travel
+----------------------------------------------------------------------------------------------------------------------------------
+T1      0.3mm (12mil)                                             Round             157       PTH        716.64mm (28.21inch)
+T2      0.4mm (16mil)                                             Round             71        PTH        360.12mm (14.18inch)
+T3      0.7mm (28mil)                                             Round             2         PTH        4.85mm (0.19inch)
+T4      0.75mm (30mil)                                            Round             2         PTH        3.11mm (0.12inch)
+T5      0.9mm (35mil)                                             Round             2         PTH        2.50mm (0.10inch)
+T6      1.5mm (59mil)                                             Round             2         PTH        7.20mm (0.28inch)
+T7      2.2mm (87mil)                                             Round             2         PTH        39.00mm (1.54inch)
+T8      3.15mm (124mil)                                           Round             1         PTH        0.00mm (0.00inch)
+T9      3.15mm (124mil)                                           Round             6         NPTH       212.08mm (8.35inch)
+----------------------------------------------------------------------------------------------------------------------------------
+Totals                                                                              245
+
+Total Processing Time (hh:mm:ss) : 00:00:00
