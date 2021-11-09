@@ -121,6 +121,30 @@ namespace HUlamp
             return stream.ToArray();
         }
 
+        public static byte[] SetGlobalBrightnessCommand(params string[] values)
+        {
+            MemoryStream stream = new MemoryStream();
+            BinaryWriter binWriter = new BinaryWriter(stream);
+            binWriter.Write((byte)0x2D);
+            binWriter.Write((byte)0x2D);
+            binWriter.Write((byte)0x62);
+            binWriter.Write((byte)0x6D);
+            binWriter.Write(values[0].ToFloat());
+            return stream.ToArray();
+        }
+
+        public static byte[] SetGlobalBrightnessCommand(float value)
+        {
+            MemoryStream stream = new MemoryStream();
+            BinaryWriter binWriter = new BinaryWriter(stream);
+            binWriter.Write((byte)0x2D);
+            binWriter.Write((byte)0x2D);
+            binWriter.Write((byte)0x62);
+            binWriter.Write((byte)0x6D);
+            binWriter.Write(value);
+            return stream.ToArray();
+        }
+
         public static byte[] SetBrightnessCommand(float brt)
         {
             MemoryStream stream = new MemoryStream();
@@ -169,6 +193,18 @@ namespace HUlamp
             return stream.ToArray();
         }
 
+        public static byte[] CustomModeSetupCommand(byte steps)
+        {
+            MemoryStream stream = new MemoryStream();
+            BinaryWriter binWriter = new BinaryWriter(stream);
+            binWriter.Write((byte)0x2D);
+            binWriter.Write((byte)0x2D);
+            binWriter.Write((byte)0x63);
+            binWriter.Write((byte)0x73);
+            binWriter.Write(steps);
+            return stream.ToArray();
+        }
+
         public static byte[] CustomModeDataCommand(params string[] values)
         {
             MemoryStream stream = new MemoryStream();
@@ -189,6 +225,30 @@ namespace HUlamp
             binWriter.Write(values[6].ToFloat());
             binWriter.Write(values[7].ToFloat());
             binWriter.Write(values[8].ToFloat());
+            return stream.ToArray();
+        }
+
+        public static byte[] CustomModeDataCommand(byte step, float brightness, float brightnessStep, float red, float redStep,
+            float green, float greenStep, float blue, float blueStep)
+        {
+            MemoryStream stream = new MemoryStream();
+            BinaryWriter binWriter = new BinaryWriter(stream);
+            binWriter.Write((byte)0x2D);
+            binWriter.Write((byte)0x2D);
+            binWriter.Write((byte)0x63);
+            binWriter.Write((byte)0x64);
+            binWriter.Write(step);
+            binWriter.Write(step);
+            binWriter.Write(step);
+            binWriter.Write(step);
+            binWriter.Write(brightness);
+            binWriter.Write(brightnessStep);
+            binWriter.Write(red);
+            binWriter.Write(redStep);
+            binWriter.Write(green);
+            binWriter.Write(greenStep);
+            binWriter.Write(blue);
+            binWriter.Write(blueStep);
             return stream.ToArray();
         }
 

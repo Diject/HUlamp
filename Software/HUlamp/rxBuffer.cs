@@ -26,15 +26,15 @@ namespace HUlamp
 
     class RxAltDataArgs
     {
-        public byte ETXMode;
-        public float NoLoadCurrent;
-        public byte LEDState;
-        public byte BacklightMode;
-        public float BacklightRed;
-        public float BacklightGreen;
-        public float BacklightBlue;
-        public float BacklightBrightness;
-        public float BrightnessMultiplier;
+        public byte ETXMode = 0;
+        public float NoLoadCurrent = 0;
+        public byte LEDState = 0;
+        public byte BacklightMode = 0;
+        public float BacklightRed = 0;
+        public float BacklightGreen = 0;
+        public float BacklightBlue = 0;
+        public float BacklightBrightness = 0;
+        public float BrightnessMultiplier = 0;
     }
 
     class RxBuffer

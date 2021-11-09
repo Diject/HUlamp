@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Отметить все");
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.comportBox = new System.Windows.Forms.ComboBox();
             this.comportConnectB = new System.Windows.Forms.Button();
@@ -58,10 +59,29 @@
             this.receiveTextBox = new System.Windows.Forms.RichTextBox();
             this.comportDisconnectB = new System.Windows.Forms.Button();
             this.VisualizationOnButton = new System.Windows.Forms.Button();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabControl = new System.Windows.Forms.TabControl();
+            this.tabFastSettings = new System.Windows.Forms.TabPage();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.nsChangeColorB = new System.Windows.Forms.Button();
+            this.nsColorPanel = new System.Windows.Forms.Panel();
+            this.nsSetModeB = new System.Windows.Forms.Button();
+            this.nsModeRB5 = new System.Windows.Forms.RadioButton();
+            this.nsModeRB4 = new System.Windows.Forms.RadioButton();
+            this.nsModeRB3 = new System.Windows.Forms.RadioButton();
+            this.nsModeRB2 = new System.Windows.Forms.RadioButton();
+            this.nsModeRB1 = new System.Windows.Forms.RadioButton();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label32 = new System.Windows.Forms.Label();
+            this.nsVisualizationVolumeTB = new System.Windows.Forms.TrackBar();
+            this.nsVisualizationAutoVol = new System.Windows.Forms.CheckBox();
+            this.nsVisualizationStartOn = new System.Windows.Forms.CheckBox();
+            this.nsVisualizationOnCB = new System.Windows.Forms.CheckBox();
             this.tabCommands = new System.Windows.Forms.TabPage();
             this.commandInfoTextBox = new System.Windows.Forms.RichTextBox();
             this.tabVisualization = new System.Windows.Forms.TabPage();
+            this.statLabD3 = new System.Windows.Forms.Label();
+            this.statLabD2 = new System.Windows.Forms.Label();
+            this.statLabD1 = new System.Windows.Forms.Label();
             this.label29 = new System.Windows.Forms.Label();
             this.textBoxVolumeUpdateTim = new System.Windows.Forms.TextBox();
             this.statLab12 = new System.Windows.Forms.Label();
@@ -86,6 +106,9 @@
             this.textBoxFallV = new System.Windows.Forms.TextBox();
             this.textBoxRiseV = new System.Windows.Forms.TextBox();
             this.groupBoxVolume = new System.Windows.Forms.GroupBox();
+            this.autoVolumeResB = new System.Windows.Forms.Button();
+            this.label31 = new System.Windows.Forms.Label();
+            this.textBoxVolPow = new System.Windows.Forms.TextBox();
             this.label26 = new System.Windows.Forms.Label();
             this.label25 = new System.Windows.Forms.Label();
             this.label24 = new System.Windows.Forms.Label();
@@ -140,19 +163,51 @@
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.tabTerminal = new System.Windows.Forms.TabPage();
+            this.tabCustomMode = new System.Windows.Forms.TabPage();
+            this.label30 = new System.Windows.Forms.Label();
+            this.cmBrtMultextBox = new System.Windows.Forms.TextBox();
+            this.cmSaveCB = new System.Windows.Forms.CheckBox();
+            this.cmCustomModeOnOffB = new System.Windows.Forms.Button();
+            this.cmLoadToDeviceB = new System.Windows.Forms.Button();
+            this.cmChangeB = new System.Windows.Forms.Button();
+            this.cmDeleteSelectedB = new System.Windows.Forms.Button();
+            this.cmAddB = new System.Windows.Forms.Button();
+            this.cmTreeView = new System.Windows.Forms.TreeView();
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.autoConnectCB = new System.Windows.Forms.CheckBox();
             this.timerStatusUpdate = new System.Windows.Forms.Timer(this.components);
             this.formMinimizeCB = new System.Windows.Forms.CheckBox();
             this.toolTips = new System.Windows.Forms.ToolTip(this.components);
+            this.cmListContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.cmMenuItemInsert = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmMenuItemDuplicate = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmMenuItemChange = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmMenuItemDelete = new System.Windows.Forms.ToolStripMenuItem();
+            this.retryTimer = new System.Windows.Forms.Timer(this.components);
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.nsBacklightStateCB = new System.Windows.Forms.CheckBox();
+            this.nsTransmitterStateCB = new System.Windows.Forms.CheckBox();
+            this.nsBacklightTB = new System.Windows.Forms.TrackBar();
+            this.label33 = new System.Windows.Forms.Label();
+            this.nsBacklightSetB = new System.Windows.Forms.Button();
+            this.nsDataUpdate = new System.Windows.Forms.Button();
+            this.nsDeviceRebootB = new System.Windows.Forms.Button();
             this.commandGroup.SuspendLayout();
-            this.tabControl1.SuspendLayout();
+            this.tabControl.SuspendLayout();
+            this.tabFastSettings.SuspendLayout();
+            this.groupBox2.SuspendLayout();
+            this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nsVisualizationVolumeTB)).BeginInit();
             this.tabCommands.SuspendLayout();
             this.tabVisualization.SuspendLayout();
             this.groupBoxVolume.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.brightnessTrackBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bufferTrackBar)).BeginInit();
             this.tabTerminal.SuspendLayout();
+            this.tabCustomMode.SuspendLayout();
+            this.cmListContextMenu.SuspendLayout();
+            this.groupBox3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nsBacklightTB)).BeginInit();
             this.SuspendLayout();
             // 
             // comportBox
@@ -437,17 +492,202 @@
             this.VisualizationOnButton.UseVisualStyleBackColor = true;
             this.VisualizationOnButton.Click += new System.EventHandler(this.Button1_Click);
             // 
-            // tabControl1
+            // tabControl
             // 
-            this.tabControl1.Controls.Add(this.tabCommands);
-            this.tabControl1.Controls.Add(this.tabVisualization);
-            this.tabControl1.Controls.Add(this.tabTerminal);
-            this.tabControl1.Location = new System.Drawing.Point(12, 41);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(651, 416);
-            this.tabControl1.TabIndex = 4;
-            this.tabControl1.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.tabControl1_Selecting);
+            this.tabControl.Controls.Add(this.tabFastSettings);
+            this.tabControl.Controls.Add(this.tabCommands);
+            this.tabControl.Controls.Add(this.tabVisualization);
+            this.tabControl.Controls.Add(this.tabTerminal);
+            this.tabControl.Controls.Add(this.tabCustomMode);
+            this.tabControl.Location = new System.Drawing.Point(12, 41);
+            this.tabControl.Name = "tabControl";
+            this.tabControl.SelectedIndex = 0;
+            this.tabControl.Size = new System.Drawing.Size(655, 416);
+            this.tabControl.TabIndex = 4;
+            this.tabControl.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.tabControl1_Selecting);
+            // 
+            // tabFastSettings
+            // 
+            this.tabFastSettings.BackColor = System.Drawing.SystemColors.Control;
+            this.tabFastSettings.Controls.Add(this.nsDataUpdate);
+            this.tabFastSettings.Controls.Add(this.groupBox3);
+            this.tabFastSettings.Controls.Add(this.groupBox2);
+            this.tabFastSettings.Controls.Add(this.groupBox1);
+            this.tabFastSettings.Location = new System.Drawing.Point(4, 22);
+            this.tabFastSettings.Name = "tabFastSettings";
+            this.tabFastSettings.Size = new System.Drawing.Size(647, 390);
+            this.tabFastSettings.TabIndex = 4;
+            this.tabFastSettings.Text = "Newbie Settings";
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.nsChangeColorB);
+            this.groupBox2.Controls.Add(this.nsColorPanel);
+            this.groupBox2.Controls.Add(this.nsSetModeB);
+            this.groupBox2.Controls.Add(this.nsModeRB5);
+            this.groupBox2.Controls.Add(this.nsModeRB4);
+            this.groupBox2.Controls.Add(this.nsModeRB3);
+            this.groupBox2.Controls.Add(this.nsModeRB2);
+            this.groupBox2.Controls.Add(this.nsModeRB1);
+            this.groupBox2.Location = new System.Drawing.Point(3, 75);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(296, 138);
+            this.groupBox2.TabIndex = 1;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Режимы";
+            // 
+            // nsChangeColorB
+            // 
+            this.nsChangeColorB.Location = new System.Drawing.Point(179, 13);
+            this.nsChangeColorB.Name = "nsChangeColorB";
+            this.nsChangeColorB.Size = new System.Drawing.Size(100, 23);
+            this.nsChangeColorB.TabIndex = 7;
+            this.nsChangeColorB.Text = "Изменить цвет";
+            this.nsChangeColorB.UseVisualStyleBackColor = true;
+            this.nsChangeColorB.Click += new System.EventHandler(this.nsChangeColorB_Click);
+            // 
+            // nsColorPanel
+            // 
+            this.nsColorPanel.BackColor = System.Drawing.Color.Red;
+            this.nsColorPanel.Location = new System.Drawing.Point(150, 13);
+            this.nsColorPanel.Name = "nsColorPanel";
+            this.nsColorPanel.Size = new System.Drawing.Size(23, 23);
+            this.nsColorPanel.TabIndex = 6;
+            this.nsColorPanel.Click += new System.EventHandler(this.nsChangeColorB_Click);
+            // 
+            // nsSetModeB
+            // 
+            this.nsSetModeB.Location = new System.Drawing.Point(150, 105);
+            this.nsSetModeB.Name = "nsSetModeB";
+            this.nsSetModeB.Size = new System.Drawing.Size(129, 23);
+            this.nsSetModeB.TabIndex = 5;
+            this.nsSetModeB.Text = "Установить режим";
+            this.nsSetModeB.UseVisualStyleBackColor = false;
+            this.nsSetModeB.Click += new System.EventHandler(this.nsSetModeB_Click);
+            // 
+            // nsModeRB5
+            // 
+            this.nsModeRB5.AutoSize = true;
+            this.nsModeRB5.Location = new System.Drawing.Point(6, 111);
+            this.nsModeRB5.Name = "nsModeRB5";
+            this.nsModeRB5.Size = new System.Drawing.Size(71, 17);
+            this.nsModeRB5.TabIndex = 4;
+            this.nsModeRB5.TabStop = true;
+            this.nsModeRB5.Text = "Сияние 2";
+            this.nsModeRB5.UseVisualStyleBackColor = true;
+            // 
+            // nsModeRB4
+            // 
+            this.nsModeRB4.AutoSize = true;
+            this.nsModeRB4.Location = new System.Drawing.Point(6, 88);
+            this.nsModeRB4.Name = "nsModeRB4";
+            this.nsModeRB4.Size = new System.Drawing.Size(71, 17);
+            this.nsModeRB4.TabIndex = 3;
+            this.nsModeRB4.TabStop = true;
+            this.nsModeRB4.Text = "Сияние 1";
+            this.nsModeRB4.UseVisualStyleBackColor = true;
+            // 
+            // nsModeRB3
+            // 
+            this.nsModeRB3.AutoSize = true;
+            this.nsModeRB3.Location = new System.Drawing.Point(6, 65);
+            this.nsModeRB3.Name = "nsModeRB3";
+            this.nsModeRB3.Size = new System.Drawing.Size(122, 17);
+            this.nsModeRB3.TabIndex = 2;
+            this.nsModeRB3.TabStop = true;
+            this.nsModeRB3.Text = "Пользовательский";
+            this.nsModeRB3.UseVisualStyleBackColor = true;
+            // 
+            // nsModeRB2
+            // 
+            this.nsModeRB2.AutoSize = true;
+            this.nsModeRB2.Location = new System.Drawing.Point(6, 42);
+            this.nsModeRB2.Name = "nsModeRB2";
+            this.nsModeRB2.Size = new System.Drawing.Size(129, 17);
+            this.nsModeRB2.TabIndex = 1;
+            this.nsModeRB2.TabStop = true;
+            this.nsModeRB2.Text = "Предустановленный";
+            this.nsModeRB2.UseVisualStyleBackColor = true;
+            // 
+            // nsModeRB1
+            // 
+            this.nsModeRB1.AutoSize = true;
+            this.nsModeRB1.Location = new System.Drawing.Point(6, 19);
+            this.nsModeRB1.Name = "nsModeRB1";
+            this.nsModeRB1.Size = new System.Drawing.Size(60, 17);
+            this.nsModeRB1.TabIndex = 0;
+            this.nsModeRB1.TabStop = true;
+            this.nsModeRB1.Text = "Ручной";
+            this.nsModeRB1.UseVisualStyleBackColor = true;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.label32);
+            this.groupBox1.Controls.Add(this.nsVisualizationVolumeTB);
+            this.groupBox1.Controls.Add(this.nsVisualizationAutoVol);
+            this.groupBox1.Controls.Add(this.nsVisualizationStartOn);
+            this.groupBox1.Controls.Add(this.nsVisualizationOnCB);
+            this.groupBox1.Location = new System.Drawing.Point(3, 3);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(637, 66);
+            this.groupBox1.TabIndex = 0;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Визуализация";
+            // 
+            // label32
+            // 
+            this.label32.AutoSize = true;
+            this.label32.Location = new System.Drawing.Point(147, 46);
+            this.label32.Name = "label32";
+            this.label32.Size = new System.Drawing.Size(122, 13);
+            this.label32.TabIndex = 4;
+            this.label32.Text = "Максимальна яркость";
+            // 
+            // nsVisualizationVolumeTB
+            // 
+            this.nsVisualizationVolumeTB.AutoSize = false;
+            this.nsVisualizationVolumeTB.Location = new System.Drawing.Point(275, 39);
+            this.nsVisualizationVolumeTB.Maximum = 100;
+            this.nsVisualizationVolumeTB.Minimum = 5;
+            this.nsVisualizationVolumeTB.Name = "nsVisualizationVolumeTB";
+            this.nsVisualizationVolumeTB.Size = new System.Drawing.Size(96, 20);
+            this.nsVisualizationVolumeTB.TabIndex = 3;
+            this.nsVisualizationVolumeTB.TickFrequency = 10;
+            this.nsVisualizationVolumeTB.Value = 5;
+            this.nsVisualizationVolumeTB.ValueChanged += new System.EventHandler(this.nsVisualizationVolumeTB_ValueChanged);
+            // 
+            // nsVisualizationAutoVol
+            // 
+            this.nsVisualizationAutoVol.AutoSize = true;
+            this.nsVisualizationAutoVol.Location = new System.Drawing.Point(150, 19);
+            this.nsVisualizationAutoVol.Name = "nsVisualizationAutoVol";
+            this.nsVisualizationAutoVol.Size = new System.Drawing.Size(221, 17);
+            this.nsVisualizationAutoVol.TabIndex = 2;
+            this.nsVisualizationAutoVol.Text = "Автоматическая регулировка яркости";
+            this.nsVisualizationAutoVol.UseVisualStyleBackColor = true;
+            this.nsVisualizationAutoVol.CheckedChanged += new System.EventHandler(this.nsVisualizationAutoVol_CheckedChanged);
+            // 
+            // nsVisualizationStartOn
+            // 
+            this.nsVisualizationStartOn.AutoSize = true;
+            this.nsVisualizationStartOn.Location = new System.Drawing.Point(6, 42);
+            this.nsVisualizationStartOn.Name = "nsVisualizationStartOn";
+            this.nsVisualizationStartOn.Size = new System.Drawing.Size(133, 17);
+            this.nsVisualizationStartOn.TabIndex = 1;
+            this.nsVisualizationStartOn.Text = "Включать при старте";
+            this.nsVisualizationStartOn.UseVisualStyleBackColor = true;
+            this.nsVisualizationStartOn.CheckedChanged += new System.EventHandler(this.nsVisualizationStartOn_CheckedChanged);
+            // 
+            // nsVisualizationOnCB
+            // 
+            this.nsVisualizationOnCB.AutoSize = true;
+            this.nsVisualizationOnCB.Location = new System.Drawing.Point(6, 19);
+            this.nsVisualizationOnCB.Name = "nsVisualizationOnCB";
+            this.nsVisualizationOnCB.Size = new System.Drawing.Size(76, 17);
+            this.nsVisualizationOnCB.TabIndex = 0;
+            this.nsVisualizationOnCB.Text = "Включено";
+            this.nsVisualizationOnCB.UseVisualStyleBackColor = true;
+            this.nsVisualizationOnCB.CheckedChanged += new System.EventHandler(this.nsVisualizationOnCB_CheckedChanged);
             // 
             // tabCommands
             // 
@@ -456,7 +696,7 @@
             this.tabCommands.Location = new System.Drawing.Point(4, 22);
             this.tabCommands.Name = "tabCommands";
             this.tabCommands.Padding = new System.Windows.Forms.Padding(3);
-            this.tabCommands.Size = new System.Drawing.Size(643, 390);
+            this.tabCommands.Size = new System.Drawing.Size(647, 390);
             this.tabCommands.TabIndex = 0;
             this.tabCommands.Text = "Команды";
             // 
@@ -473,6 +713,9 @@
             // 
             // tabVisualization
             // 
+            this.tabVisualization.Controls.Add(this.statLabD3);
+            this.tabVisualization.Controls.Add(this.statLabD2);
+            this.tabVisualization.Controls.Add(this.statLabD1);
             this.tabVisualization.Controls.Add(this.label29);
             this.tabVisualization.Controls.Add(this.textBoxVolumeUpdateTim);
             this.tabVisualization.Controls.Add(this.statLab12);
@@ -545,9 +788,39 @@
             this.tabVisualization.Location = new System.Drawing.Point(4, 22);
             this.tabVisualization.Name = "tabVisualization";
             this.tabVisualization.Padding = new System.Windows.Forms.Padding(3);
-            this.tabVisualization.Size = new System.Drawing.Size(643, 390);
+            this.tabVisualization.Size = new System.Drawing.Size(647, 390);
             this.tabVisualization.TabIndex = 1;
             this.tabVisualization.Text = "Визуализация";
+            // 
+            // statLabD3
+            // 
+            this.statLabD3.Location = new System.Drawing.Point(6, 285);
+            this.statLabD3.Name = "statLabD3";
+            this.statLabD3.Size = new System.Drawing.Size(57, 13);
+            this.statLabD3.TabIndex = 87;
+            this.statLabD3.Text = "Max";
+            this.statLabD3.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.statLabD3.Visible = false;
+            // 
+            // statLabD2
+            // 
+            this.statLabD2.Location = new System.Drawing.Point(6, 267);
+            this.statLabD2.Name = "statLabD2";
+            this.statLabD2.Size = new System.Drawing.Size(57, 13);
+            this.statLabD2.TabIndex = 86;
+            this.statLabD2.Text = "Current";
+            this.statLabD2.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.statLabD2.Visible = false;
+            // 
+            // statLabD1
+            // 
+            this.statLabD1.Location = new System.Drawing.Point(6, 249);
+            this.statLabD1.Name = "statLabD1";
+            this.statLabD1.Size = new System.Drawing.Size(57, 13);
+            this.statLabD1.TabIndex = 85;
+            this.statLabD1.Text = "Target";
+            this.statLabD1.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.statLabD1.Visible = false;
             // 
             // label29
             // 
@@ -569,122 +842,134 @@
             // statLab12
             // 
             this.statLab12.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.statLab12.Location = new System.Drawing.Point(451, 267);
+            this.statLab12.Location = new System.Drawing.Point(455, 267);
             this.statLab12.Name = "statLab12";
             this.statLab12.Size = new System.Drawing.Size(41, 13);
             this.statLab12.TabIndex = 82;
             this.statLab12.Text = "1";
             this.statLab12.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.statLab12.Visible = false;
             // 
             // statLab11
             // 
             this.statLab11.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.statLab11.Location = new System.Drawing.Point(328, 267);
+            this.statLab11.Location = new System.Drawing.Point(332, 267);
             this.statLab11.Name = "statLab11";
             this.statLab11.Size = new System.Drawing.Size(41, 13);
             this.statLab11.TabIndex = 81;
             this.statLab11.Text = "1";
             this.statLab11.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.statLab11.Visible = false;
             // 
             // statLab10
             // 
             this.statLab10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.statLab10.Location = new System.Drawing.Point(205, 267);
+            this.statLab10.Location = new System.Drawing.Point(209, 267);
             this.statLab10.Name = "statLab10";
             this.statLab10.Size = new System.Drawing.Size(41, 13);
             this.statLab10.TabIndex = 80;
             this.statLab10.Text = "1";
             this.statLab10.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.statLab10.Visible = false;
             // 
             // statLab9
             // 
             this.statLab9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.statLab9.Location = new System.Drawing.Point(82, 267);
+            this.statLab9.Location = new System.Drawing.Point(86, 267);
             this.statLab9.Name = "statLab9";
             this.statLab9.Size = new System.Drawing.Size(41, 13);
             this.statLab9.TabIndex = 79;
             this.statLab9.Text = "1";
             this.statLab9.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.statLab9.Visible = false;
             // 
             // statLab8
             // 
             this.statLab8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.statLab8.Location = new System.Drawing.Point(451, 285);
+            this.statLab8.Location = new System.Drawing.Point(455, 285);
             this.statLab8.Name = "statLab8";
             this.statLab8.Size = new System.Drawing.Size(41, 13);
             this.statLab8.TabIndex = 78;
             this.statLab8.Text = "1";
             this.statLab8.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.statLab8.Visible = false;
             // 
             // statLab4
             // 
             this.statLab4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.statLab4.Location = new System.Drawing.Point(451, 249);
+            this.statLab4.Location = new System.Drawing.Point(455, 249);
             this.statLab4.Name = "statLab4";
             this.statLab4.Size = new System.Drawing.Size(41, 13);
             this.statLab4.TabIndex = 77;
             this.statLab4.Text = "1";
             this.statLab4.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.statLab4.Visible = false;
             // 
             // statLab7
             // 
             this.statLab7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.statLab7.Location = new System.Drawing.Point(328, 285);
+            this.statLab7.Location = new System.Drawing.Point(332, 285);
             this.statLab7.Name = "statLab7";
             this.statLab7.Size = new System.Drawing.Size(41, 13);
             this.statLab7.TabIndex = 76;
             this.statLab7.Text = "1";
             this.statLab7.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.statLab7.Visible = false;
             // 
             // statLab6
             // 
             this.statLab6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.statLab6.Location = new System.Drawing.Point(205, 285);
+            this.statLab6.Location = new System.Drawing.Point(209, 285);
             this.statLab6.Name = "statLab6";
             this.statLab6.Size = new System.Drawing.Size(41, 13);
             this.statLab6.TabIndex = 75;
             this.statLab6.Text = "1";
             this.statLab6.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.statLab6.Visible = false;
             // 
             // statLab5
             // 
             this.statLab5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.statLab5.Location = new System.Drawing.Point(82, 285);
+            this.statLab5.Location = new System.Drawing.Point(86, 285);
             this.statLab5.Name = "statLab5";
             this.statLab5.Size = new System.Drawing.Size(41, 13);
             this.statLab5.TabIndex = 74;
             this.statLab5.Text = "1";
             this.statLab5.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.statLab5.Visible = false;
             // 
             // statLab3
             // 
             this.statLab3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.statLab3.Location = new System.Drawing.Point(328, 249);
+            this.statLab3.Location = new System.Drawing.Point(332, 249);
             this.statLab3.Name = "statLab3";
             this.statLab3.Size = new System.Drawing.Size(41, 13);
             this.statLab3.TabIndex = 73;
             this.statLab3.Text = "1";
             this.statLab3.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.statLab3.Visible = false;
             // 
             // statLab2
             // 
             this.statLab2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.statLab2.Location = new System.Drawing.Point(205, 249);
+            this.statLab2.Location = new System.Drawing.Point(209, 249);
             this.statLab2.Name = "statLab2";
             this.statLab2.Size = new System.Drawing.Size(41, 13);
             this.statLab2.TabIndex = 72;
             this.statLab2.Text = "1";
             this.statLab2.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.statLab2.Visible = false;
             // 
             // statLab1
             // 
             this.statLab1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.statLab1.Location = new System.Drawing.Point(82, 249);
+            this.statLab1.Location = new System.Drawing.Point(86, 249);
             this.statLab1.Name = "statLab1";
             this.statLab1.Size = new System.Drawing.Size(41, 13);
             this.statLab1.TabIndex = 71;
             this.statLab1.Text = "1";
             this.statLab1.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.statLab1.Visible = false;
             // 
             // statisticCheckBox
             // 
@@ -769,6 +1054,9 @@
             // 
             // groupBoxVolume
             // 
+            this.groupBoxVolume.Controls.Add(this.autoVolumeResB);
+            this.groupBoxVolume.Controls.Add(this.label31);
+            this.groupBoxVolume.Controls.Add(this.textBoxVolPow);
             this.groupBoxVolume.Controls.Add(this.label26);
             this.groupBoxVolume.Controls.Add(this.label25);
             this.groupBoxVolume.Controls.Add(this.label24);
@@ -785,10 +1073,38 @@
             this.groupBoxVolume.TabStop = false;
             this.groupBoxVolume.Text = "Volume";
             // 
+            // autoVolumeResB
+            // 
+            this.autoVolumeResB.Location = new System.Drawing.Point(91, 52);
+            this.autoVolumeResB.Name = "autoVolumeResB";
+            this.autoVolumeResB.Size = new System.Drawing.Size(36, 23);
+            this.autoVolumeResB.TabIndex = 89;
+            this.autoVolumeResB.Text = "Res";
+            this.autoVolumeResB.UseVisualStyleBackColor = true;
+            this.autoVolumeResB.Click += new System.EventHandler(this.autoVolumeResB_Click);
+            // 
+            // label31
+            // 
+            this.label31.AutoSize = true;
+            this.label31.Location = new System.Drawing.Point(449, 57);
+            this.label31.Name = "label31";
+            this.label31.Size = new System.Drawing.Size(37, 13);
+            this.label31.TabIndex = 88;
+            this.label31.Text = "Power";
+            this.toolTips.SetToolTip(this.label31, "Множитель степени для вычисления значения визуализации громкости");
+            // 
+            // textBoxVolPow
+            // 
+            this.textBoxVolPow.Location = new System.Drawing.Point(492, 54);
+            this.textBoxVolPow.Name = "textBoxVolPow";
+            this.textBoxVolPow.Size = new System.Drawing.Size(40, 20);
+            this.textBoxVolPow.TabIndex = 87;
+            this.textBoxVolPow.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
             // label26
             // 
             this.label26.AutoSize = true;
-            this.label26.Location = new System.Drawing.Point(300, 57);
+            this.label26.Location = new System.Drawing.Point(328, 57);
             this.label26.Name = "label26";
             this.label26.Size = new System.Drawing.Size(55, 13);
             this.label26.TabIndex = 69;
@@ -798,7 +1114,7 @@
             // label25
             // 
             this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(201, 57);
+            this.label25.Location = new System.Drawing.Point(232, 57);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(44, 13);
             this.label25.TabIndex = 68;
@@ -808,7 +1124,7 @@
             // label24
             // 
             this.label24.AutoSize = true;
-            this.label24.Location = new System.Drawing.Point(100, 57);
+            this.label24.Location = new System.Drawing.Point(133, 57);
             this.label24.Name = "label24";
             this.label24.Size = new System.Drawing.Size(38, 13);
             this.label24.TabIndex = 67;
@@ -817,7 +1133,7 @@
             // 
             // textBoxAutoVolStep
             // 
-            this.textBoxAutoVolStep.Location = new System.Drawing.Point(358, 54);
+            this.textBoxAutoVolStep.Location = new System.Drawing.Point(387, 54);
             this.textBoxAutoVolStep.Name = "textBoxAutoVolStep";
             this.textBoxAutoVolStep.Size = new System.Drawing.Size(40, 20);
             this.textBoxAutoVolStep.TabIndex = 10;
@@ -825,7 +1141,7 @@
             // 
             // textBoxAutoVolCounter
             // 
-            this.textBoxAutoVolCounter.Location = new System.Drawing.Point(251, 54);
+            this.textBoxAutoVolCounter.Location = new System.Drawing.Point(282, 54);
             this.textBoxAutoVolCounter.Name = "textBoxAutoVolCounter";
             this.textBoxAutoVolCounter.Size = new System.Drawing.Size(40, 20);
             this.textBoxAutoVolCounter.TabIndex = 9;
@@ -833,7 +1149,7 @@
             // 
             // textBoxAutoVolTarget
             // 
-            this.textBoxAutoVolTarget.Location = new System.Drawing.Point(144, 54);
+            this.textBoxAutoVolTarget.Location = new System.Drawing.Point(177, 54);
             this.textBoxAutoVolTarget.Name = "textBoxAutoVolTarget";
             this.textBoxAutoVolTarget.Size = new System.Drawing.Size(40, 20);
             this.textBoxAutoVolTarget.TabIndex = 8;
@@ -848,6 +1164,7 @@
             this.brightnessTrackBar.Name = "brightnessTrackBar";
             this.brightnessTrackBar.Size = new System.Drawing.Size(504, 25);
             this.brightnessTrackBar.TabIndex = 6;
+            this.brightnessTrackBar.TickFrequency = 10;
             this.brightnessTrackBar.Value = 50;
             this.brightnessTrackBar.ValueChanged += new System.EventHandler(this.BrightnessTrackBar_ValueChanged);
             // 
@@ -1281,9 +1598,128 @@
             this.tabTerminal.Controls.Add(this.receiveTextBox);
             this.tabTerminal.Location = new System.Drawing.Point(4, 22);
             this.tabTerminal.Name = "tabTerminal";
-            this.tabTerminal.Size = new System.Drawing.Size(643, 390);
+            this.tabTerminal.Size = new System.Drawing.Size(647, 390);
             this.tabTerminal.TabIndex = 2;
             this.tabTerminal.Text = "Терминал";
+            // 
+            // tabCustomMode
+            // 
+            this.tabCustomMode.BackColor = System.Drawing.SystemColors.Control;
+            this.tabCustomMode.Controls.Add(this.label30);
+            this.tabCustomMode.Controls.Add(this.cmBrtMultextBox);
+            this.tabCustomMode.Controls.Add(this.cmSaveCB);
+            this.tabCustomMode.Controls.Add(this.cmCustomModeOnOffB);
+            this.tabCustomMode.Controls.Add(this.cmLoadToDeviceB);
+            this.tabCustomMode.Controls.Add(this.cmChangeB);
+            this.tabCustomMode.Controls.Add(this.cmDeleteSelectedB);
+            this.tabCustomMode.Controls.Add(this.cmAddB);
+            this.tabCustomMode.Controls.Add(this.cmTreeView);
+            this.tabCustomMode.Location = new System.Drawing.Point(4, 22);
+            this.tabCustomMode.Name = "tabCustomMode";
+            this.tabCustomMode.Size = new System.Drawing.Size(647, 390);
+            this.tabCustomMode.TabIndex = 3;
+            this.tabCustomMode.Text = "Custom Mode";
+            // 
+            // label30
+            // 
+            this.label30.AutoSize = true;
+            this.label30.Location = new System.Drawing.Point(289, 12);
+            this.label30.Name = "label30";
+            this.label30.Size = new System.Drawing.Size(109, 13);
+            this.label30.TabIndex = 17;
+            this.label30.Text = "Множитель яркости";
+            // 
+            // cmBrtMultextBox
+            // 
+            this.cmBrtMultextBox.Location = new System.Drawing.Point(404, 9);
+            this.cmBrtMultextBox.Name = "cmBrtMultextBox";
+            this.cmBrtMultextBox.Size = new System.Drawing.Size(44, 20);
+            this.cmBrtMultextBox.TabIndex = 16;
+            this.cmBrtMultextBox.Text = "1";
+            this.cmBrtMultextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // cmSaveCB
+            // 
+            this.cmSaveCB.AutoSize = true;
+            this.cmSaveCB.Checked = true;
+            this.cmSaveCB.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cmSaveCB.Location = new System.Drawing.Point(484, 340);
+            this.cmSaveCB.Name = "cmSaveCB";
+            this.cmSaveCB.Size = new System.Drawing.Size(128, 17);
+            this.cmSaveCB.TabIndex = 6;
+            this.cmSaveCB.Text = "Сохранить в память";
+            this.cmSaveCB.UseVisualStyleBackColor = true;
+            // 
+            // cmCustomModeOnOffB
+            // 
+            this.cmCustomModeOnOffB.Location = new System.Drawing.Point(565, 363);
+            this.cmCustomModeOnOffB.Name = "cmCustomModeOnOffB";
+            this.cmCustomModeOnOffB.Size = new System.Drawing.Size(75, 23);
+            this.cmCustomModeOnOffB.TabIndex = 5;
+            this.cmCustomModeOnOffB.Text = "Включить";
+            this.cmCustomModeOnOffB.UseVisualStyleBackColor = true;
+            this.cmCustomModeOnOffB.Click += new System.EventHandler(this.cmCustomModeOnOffB_Click);
+            // 
+            // cmLoadToDeviceB
+            // 
+            this.cmLoadToDeviceB.Location = new System.Drawing.Point(484, 363);
+            this.cmLoadToDeviceB.Name = "cmLoadToDeviceB";
+            this.cmLoadToDeviceB.Size = new System.Drawing.Size(75, 23);
+            this.cmLoadToDeviceB.TabIndex = 4;
+            this.cmLoadToDeviceB.Text = "Загрузить";
+            this.cmLoadToDeviceB.UseVisualStyleBackColor = true;
+            this.cmLoadToDeviceB.Click += new System.EventHandler(this.cmLoadToDeviceB_Click);
+            // 
+            // cmChangeB
+            // 
+            this.cmChangeB.Location = new System.Drawing.Point(373, 37);
+            this.cmChangeB.Name = "cmChangeB";
+            this.cmChangeB.Size = new System.Drawing.Size(75, 23);
+            this.cmChangeB.TabIndex = 3;
+            this.cmChangeB.Text = "Изменить";
+            this.cmChangeB.UseVisualStyleBackColor = true;
+            this.cmChangeB.Click += new System.EventHandler(this.cmChangeB_Click);
+            // 
+            // cmDeleteSelectedB
+            // 
+            this.cmDeleteSelectedB.Location = new System.Drawing.Point(292, 66);
+            this.cmDeleteSelectedB.Name = "cmDeleteSelectedB";
+            this.cmDeleteSelectedB.Size = new System.Drawing.Size(133, 23);
+            this.cmDeleteSelectedB.TabIndex = 2;
+            this.cmDeleteSelectedB.Text = "Удалить отмеченное";
+            this.cmDeleteSelectedB.UseVisualStyleBackColor = true;
+            this.cmDeleteSelectedB.Click += new System.EventHandler(this.cmDeleteSelectedB_Click);
+            // 
+            // cmAddB
+            // 
+            this.cmAddB.Location = new System.Drawing.Point(292, 37);
+            this.cmAddB.Name = "cmAddB";
+            this.cmAddB.Size = new System.Drawing.Size(75, 23);
+            this.cmAddB.TabIndex = 1;
+            this.cmAddB.Text = "Добавить";
+            this.cmAddB.UseVisualStyleBackColor = true;
+            this.cmAddB.Click += new System.EventHandler(this.cmAddB_Click);
+            // 
+            // cmTreeView
+            // 
+            this.cmTreeView.CheckBoxes = true;
+            this.cmTreeView.FullRowSelect = true;
+            this.cmTreeView.HideSelection = false;
+            this.cmTreeView.HotTracking = true;
+            this.cmTreeView.Location = new System.Drawing.Point(3, 3);
+            this.cmTreeView.Name = "cmTreeView";
+            treeNode1.Name = "cmTreeViewNode0";
+            treeNode1.Text = "Отметить все";
+            this.cmTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
+            treeNode1});
+            this.cmTreeView.ShowLines = false;
+            this.cmTreeView.ShowPlusMinus = false;
+            this.cmTreeView.ShowRootLines = false;
+            this.cmTreeView.Size = new System.Drawing.Size(280, 383);
+            this.cmTreeView.TabIndex = 0;
+            this.cmTreeView.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.cmTreeView_AfterCheck);
+            this.cmTreeView.DoubleClick += new System.EventHandler(this.cmTreeView_DoubleClick);
+            this.cmTreeView.MouseMove += new System.Windows.Forms.MouseEventHandler(this.cmTreeView_MouseMove);
             // 
             // notifyIcon
             // 
@@ -1319,14 +1755,145 @@
             this.formMinimizeCB.UseVisualStyleBackColor = true;
             this.formMinimizeCB.CheckedChanged += new System.EventHandler(this.formMinimizeCB_CheckedChanged);
             // 
+            // cmListContextMenu
+            // 
+            this.cmListContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.cmMenuItemInsert,
+            this.cmMenuItemDuplicate,
+            this.cmMenuItemChange,
+            this.cmMenuItemDelete});
+            this.cmListContextMenu.Name = "cmListContextMenu";
+            this.cmListContextMenu.Size = new System.Drawing.Size(147, 92);
+            // 
+            // cmMenuItemInsert
+            // 
+            this.cmMenuItemInsert.Name = "cmMenuItemInsert";
+            this.cmMenuItemInsert.Size = new System.Drawing.Size(146, 22);
+            this.cmMenuItemInsert.Text = "Добавить";
+            this.cmMenuItemInsert.Click += new System.EventHandler(this.cmMenuItemInsert_Click);
+            // 
+            // cmMenuItemDuplicate
+            // 
+            this.cmMenuItemDuplicate.Name = "cmMenuItemDuplicate";
+            this.cmMenuItemDuplicate.Size = new System.Drawing.Size(146, 22);
+            this.cmMenuItemDuplicate.Text = "Дублировать";
+            this.cmMenuItemDuplicate.Click += new System.EventHandler(this.cmMenuItemDuplicate_Click);
+            // 
+            // cmMenuItemChange
+            // 
+            this.cmMenuItemChange.Name = "cmMenuItemChange";
+            this.cmMenuItemChange.Size = new System.Drawing.Size(146, 22);
+            this.cmMenuItemChange.Text = "Изменить";
+            this.cmMenuItemChange.Click += new System.EventHandler(this.cmMenuItemChange_Click);
+            // 
+            // cmMenuItemDelete
+            // 
+            this.cmMenuItemDelete.Name = "cmMenuItemDelete";
+            this.cmMenuItemDelete.Size = new System.Drawing.Size(146, 22);
+            this.cmMenuItemDelete.Text = "Удалить";
+            this.cmMenuItemDelete.Click += new System.EventHandler(this.cmMenuItemDelete_Click);
+            // 
+            // retryTimer
+            // 
+            this.retryTimer.Enabled = true;
+            this.retryTimer.Interval = 1000;
+            this.retryTimer.Tick += new System.EventHandler(this.retryTimer_Tick);
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.nsDeviceRebootB);
+            this.groupBox3.Controls.Add(this.nsBacklightSetB);
+            this.groupBox3.Controls.Add(this.label33);
+            this.groupBox3.Controls.Add(this.nsBacklightTB);
+            this.groupBox3.Controls.Add(this.nsTransmitterStateCB);
+            this.groupBox3.Controls.Add(this.nsBacklightStateCB);
+            this.groupBox3.Location = new System.Drawing.Point(305, 75);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(335, 138);
+            this.groupBox3.TabIndex = 2;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Общие";
+            // 
+            // nsBacklightStateCB
+            // 
+            this.nsBacklightStateCB.AutoSize = true;
+            this.nsBacklightStateCB.Enabled = false;
+            this.nsBacklightStateCB.Location = new System.Drawing.Point(6, 20);
+            this.nsBacklightStateCB.Name = "nsBacklightStateCB";
+            this.nsBacklightStateCB.Size = new System.Drawing.Size(133, 17);
+            this.nsBacklightStateCB.TabIndex = 1;
+            this.nsBacklightStateCB.Text = "Подсветка вкл/выкл";
+            this.nsBacklightStateCB.UseVisualStyleBackColor = true;
+            // 
+            // nsTransmitterStateCB
+            // 
+            this.nsTransmitterStateCB.AutoSize = true;
+            this.nsTransmitterStateCB.Location = new System.Drawing.Point(6, 66);
+            this.nsTransmitterStateCB.Name = "nsTransmitterStateCB";
+            this.nsTransmitterStateCB.Size = new System.Drawing.Size(182, 17);
+            this.nsTransmitterStateCB.TabIndex = 2;
+            this.nsTransmitterStateCB.Text = "Передатчик энергии вкл/выкл";
+            this.nsTransmitterStateCB.UseVisualStyleBackColor = true;
+            this.nsTransmitterStateCB.CheckedChanged += new System.EventHandler(this.nsTransmitterStateCB_CheckedChanged);
+            // 
+            // nsBacklightTB
+            // 
+            this.nsBacklightTB.AutoSize = false;
+            this.nsBacklightTB.Location = new System.Drawing.Point(118, 43);
+            this.nsBacklightTB.Maximum = 100;
+            this.nsBacklightTB.Name = "nsBacklightTB";
+            this.nsBacklightTB.Size = new System.Drawing.Size(170, 20);
+            this.nsBacklightTB.TabIndex = 4;
+            this.nsBacklightTB.TickFrequency = 10;
+            this.nsBacklightTB.Value = 5;
+            // 
+            // label33
+            // 
+            this.label33.AutoSize = true;
+            this.label33.Location = new System.Drawing.Point(6, 44);
+            this.label33.Name = "label33";
+            this.label33.Size = new System.Drawing.Size(106, 13);
+            this.label33.TabIndex = 5;
+            this.label33.Text = "Яркость подсветки";
+            // 
+            // nsBacklightSetB
+            // 
+            this.nsBacklightSetB.Location = new System.Drawing.Point(294, 40);
+            this.nsBacklightSetB.Name = "nsBacklightSetB";
+            this.nsBacklightSetB.Size = new System.Drawing.Size(34, 23);
+            this.nsBacklightSetB.TabIndex = 6;
+            this.nsBacklightSetB.Text = "OK";
+            this.nsBacklightSetB.UseVisualStyleBackColor = true;
+            this.nsBacklightSetB.Click += new System.EventHandler(this.nsBacklightSetB_Click);
+            // 
+            // nsDataUpdate
+            // 
+            this.nsDataUpdate.Location = new System.Drawing.Point(532, 219);
+            this.nsDataUpdate.Name = "nsDataUpdate";
+            this.nsDataUpdate.Size = new System.Drawing.Size(108, 23);
+            this.nsDataUpdate.TabIndex = 3;
+            this.nsDataUpdate.Text = "Обновить данные";
+            this.nsDataUpdate.UseVisualStyleBackColor = true;
+            this.nsDataUpdate.Click += new System.EventHandler(this.nsDataUpdate_Click);
+            // 
+            // nsDeviceRebootB
+            // 
+            this.nsDeviceRebootB.Location = new System.Drawing.Point(168, 105);
+            this.nsDeviceRebootB.Name = "nsDeviceRebootB";
+            this.nsDeviceRebootB.Size = new System.Drawing.Size(160, 23);
+            this.nsDeviceRebootB.TabIndex = 7;
+            this.nsDeviceRebootB.Text = "Перезагрузить устройство";
+            this.nsDeviceRebootB.UseVisualStyleBackColor = true;
+            this.nsDeviceRebootB.Click += new System.EventHandler(this.nsDeviceRebootB_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(675, 461);
+            this.ClientSize = new System.Drawing.Size(676, 459);
             this.Controls.Add(this.formMinimizeCB);
             this.Controls.Add(this.autoConnectCB);
-            this.Controls.Add(this.tabControl1);
+            this.Controls.Add(this.tabControl);
             this.Controls.Add(this.comportDisconnectB);
             this.Controls.Add(this.comportReloadButton);
             this.Controls.Add(this.comportConnectB);
@@ -1341,7 +1908,13 @@
             this.Resize += new System.EventHandler(this.MainForm_Resize);
             this.commandGroup.ResumeLayout(false);
             this.commandGroup.PerformLayout();
-            this.tabControl1.ResumeLayout(false);
+            this.tabControl.ResumeLayout(false);
+            this.tabFastSettings.ResumeLayout(false);
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nsVisualizationVolumeTB)).EndInit();
             this.tabCommands.ResumeLayout(false);
             this.tabVisualization.ResumeLayout(false);
             this.tabVisualization.PerformLayout();
@@ -1350,6 +1923,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.brightnessTrackBar)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.bufferTrackBar)).EndInit();
             this.tabTerminal.ResumeLayout(false);
+            this.tabCustomMode.ResumeLayout(false);
+            this.tabCustomMode.PerformLayout();
+            this.cmListContextMenu.ResumeLayout(false);
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nsBacklightTB)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1385,7 +1964,7 @@
         private System.Windows.Forms.Button comportDisconnectB;
         private System.Windows.Forms.Button VisualizationOnButton;
         public System.Windows.Forms.RichTextBox receiveTextBox;
-        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabControl tabControl;
         private System.Windows.Forms.TabPage tabCommands;
         private System.Windows.Forms.TabPage tabVisualization;
         private System.Windows.Forms.NotifyIcon notifyIcon;
@@ -1472,6 +2051,52 @@
         private System.Windows.Forms.Timer timerStatusUpdate;
         private System.Windows.Forms.CheckBox formMinimizeCB;
         private System.Windows.Forms.ToolTip toolTips;
+        private System.Windows.Forms.TabPage tabCustomMode;
+        private System.Windows.Forms.Button cmAddB;
+        private System.Windows.Forms.ContextMenuStrip cmListContextMenu;
+        private System.Windows.Forms.ToolStripMenuItem cmMenuItemChange;
+        private System.Windows.Forms.ToolStripMenuItem cmMenuItemDelete;
+        private System.Windows.Forms.ToolStripMenuItem cmMenuItemInsert;
+        private System.Windows.Forms.Button cmChangeB;
+        private System.Windows.Forms.Button cmDeleteSelectedB;
+        private System.Windows.Forms.CheckBox cmSaveCB;
+        private System.Windows.Forms.Button cmCustomModeOnOffB;
+        private System.Windows.Forms.Button cmLoadToDeviceB;
+        private System.Windows.Forms.ToolStripMenuItem cmMenuItemDuplicate;
+        private System.Windows.Forms.TreeView cmTreeView;
+        private System.Windows.Forms.Label label30;
+        private System.Windows.Forms.TextBox cmBrtMultextBox;
+        private System.Windows.Forms.Label label31;
+        private System.Windows.Forms.TextBox textBoxVolPow;
+        private System.Windows.Forms.Timer retryTimer;
+        private System.Windows.Forms.Label statLabD3;
+        private System.Windows.Forms.Label statLabD2;
+        private System.Windows.Forms.Label statLabD1;
+        private System.Windows.Forms.Button autoVolumeResB;
+        private System.Windows.Forms.TabPage tabFastSettings;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.RadioButton nsModeRB5;
+        private System.Windows.Forms.RadioButton nsModeRB4;
+        private System.Windows.Forms.RadioButton nsModeRB3;
+        private System.Windows.Forms.RadioButton nsModeRB2;
+        private System.Windows.Forms.RadioButton nsModeRB1;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Label label32;
+        private System.Windows.Forms.TrackBar nsVisualizationVolumeTB;
+        private System.Windows.Forms.CheckBox nsVisualizationAutoVol;
+        private System.Windows.Forms.CheckBox nsVisualizationStartOn;
+        private System.Windows.Forms.CheckBox nsVisualizationOnCB;
+        private System.Windows.Forms.Button nsChangeColorB;
+        private System.Windows.Forms.Panel nsColorPanel;
+        private System.Windows.Forms.Button nsSetModeB;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.CheckBox nsBacklightStateCB;
+        private System.Windows.Forms.CheckBox nsTransmitterStateCB;
+        private System.Windows.Forms.Button nsBacklightSetB;
+        private System.Windows.Forms.Label label33;
+        private System.Windows.Forms.TrackBar nsBacklightTB;
+        private System.Windows.Forms.Button nsDataUpdate;
+        private System.Windows.Forms.Button nsDeviceRebootB;
     }
 }
 

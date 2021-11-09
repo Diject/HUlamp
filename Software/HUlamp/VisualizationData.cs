@@ -27,6 +27,7 @@ namespace HUlamp
                     Max[index] = Math.Max(Max[index], Value[index]);
                     Value[index] = value;
                 }
+                else Value[index] = 0;
             }
         }
 
@@ -55,17 +56,19 @@ namespace HUlamp
         public double[] StepValueLimit = new double[4] { 0, 0, 0, 0 };
         public VlueEx Value = new VlueEx();
         public double[] ValueMax = new double[5] { 0, 0, 0, 0, 0 };
-        public double[] Coefficient = new double[] { 15, 36, 60, 10 };
+        public double[] Coefficient = new double[] { 16, 36, 60, 10 };
         public int[] ColourLink = new int[4] { 2, 1, 0, 3 };
         public double[] Frequency = new double[3] { 90, 400, 8000 };
         public double[] LeaderMul = new double[3] { 1.3, 1.3, 1.3 };
         public double[] FollowerMul = new double[3] { 1, 1, 1 };
-        public double[] RiseMaxStep = new double[4] { 6, 6, 8, 0.06 };
-        public double[] FallMaxStep = new double[4] { 4, 4, 6, 0.06 };
+        public double[] RiseMaxStep = new double[4] { 6, 6, 8, 0.04 };
+        public double[] FallMaxStep = new double[4] { 4, 4, 6, 0.04 };
         public int AutoVolumeCounterMax = 3000;
         public bool AutoVolumeEnable = true;
         public double AutoVolumeMulHysteresis = 0.1;
         public double AutoVolumeTarget = 0.3;
+        public double VolumePowerValue = 1;
+        public int SilenceResetCounter = 200;
 
         private static readonly string subKey = @"Software\HUlamp Terminal\Visualization";
 
@@ -85,6 +88,8 @@ namespace HUlamp
             key.SetValue("AutoVolumeCounterMax", AutoVolumeCounterMax);
             key.SetValue("AutoVolumeMulHysteresis", AutoVolumeMulHysteresis);
             key.SetValue("AutoVolumeTarget", AutoVolumeTarget);
+            key.SetValue("VolumePowerValue", VolumePowerValue);
+            key.SetValue("SilenceResetCounter", SilenceResetCounter);
             using (MemoryStream stream = new MemoryStream())
             {
                 using (BinaryWriter binWriter = new BinaryWriter(stream))
@@ -170,8 +175,10 @@ namespace HUlamp
                     IntervalMultiplier = Convert.ToDouble(key.GetValue("IntervalMultiplier"));
                     AutoVolumeEnable = Convert.ToBoolean(key.GetValue("AutoVolumeEnable"));
                     AutoVolumeCounterMax = (int)key.GetValue("AutoVolumeCounterMax");
-                    AutoVolumeMulHysteresis = Convert.ToDouble(key.GetValue("AutoVolumeMulHysteresis"));
-                    AutoVolumeTarget = Convert.ToDouble(key.GetValue("AutoVolumeTarget"));
+                    AutoVolumeMulHysteresis = Convert.ToDouble(key.GetValue("AutoVolumeMulHysteresis") ?? AutoVolumeMulHysteresis);
+                    AutoVolumeTarget = Convert.ToDouble(key.GetValue("AutoVolumeTarget") ?? AutoVolumeTarget);
+                    VolumePowerValue = Convert.ToDouble(key.GetValue("VolumePowerValue") ?? VolumePowerValue);
+                    SilenceResetCounter = (int)(key.GetValue("SilenceResetCounter") ?? SilenceResetCounter);
 
                     using (MemoryStream stream = new MemoryStream((byte[])key.GetValue("ColourDefault")))
                     {

@@ -19,6 +19,7 @@ namespace HUlamp
         private BufferedWaveProvider _bwp;
         private bool AlternativeBuffer;
         public byte[] Buffer;
+        public bool Error = false;
 
         public LoopbackRecorder(int bufferSize, bool arrurateBuffer = false)
         {
@@ -27,12 +28,12 @@ namespace HUlamp
             if (AlternativeBuffer) Buffer = new byte[bufferSize * 2];
         }
 
-        public void StartRecording()
+        public bool StartRecording()
         {
             // If we are currently record then go ahead and exit out.
             if (_isRecording == true)
             {
-                return;
+                return true;
             }
             _waveIn = new WasapiLoopbackCapture();
             if (!AlternativeBuffer) _bwp = new BufferedWaveProvider(_waveIn.WaveFormat)
@@ -42,8 +43,19 @@ namespace HUlamp
                 };
             _waveIn.DataAvailable += OnDataAvailable;
             _waveIn.RecordingStopped += OnRecordingStopped;
-            _waveIn.StartRecording();
+            try
+            {
+                _waveIn.StartRecording();
+            }
+            catch
+            {
+                _isRecording = false;
+                Error = true;
+                return !Error;
+            }
             _isRecording = true;
+            Error = false;
+            return true;
         }
 
 
@@ -72,8 +84,11 @@ namespace HUlamp
             _isRecording = false;
             if (e.Exception != null)
             {
-                throw e.Exception;
+                //throw e.Exception;
+                Error = true;
+                return;
             }
+            Error = false;
         } // end void OnRecordingStopped
 
         void OnDataAvailable(object sender, WaveInEventArgs e)

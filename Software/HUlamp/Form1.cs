@@ -26,31 +26,20 @@ namespace HUlamp
     public partial class MainForm : Form
     {
 
-        private System.Timers.Timer timerLEDUpdate;
-        private System.Timers.Timer timer;
-        private System.Timers.Timer timerVolumeUpdate;
-
-        private int SampleRate = 44100; // sample rate of the sound card
-        private MMDeviceEnumerator enumerator;
-        private int errorCount = 0;
-        private float maxVolume = 0;
-        private int belowMaxVolumeCounter = 0;
-        private float belowMaxVolumeValue = 0;
-        private float systemVolume = 1;
-
-        private LoopbackRecorder Recorder;
-        private WaveFormat AudioFormat;
-
         private RxBuffer Buffer;
         private RxAltDataArgs DeviceSettings;
         private bool ShowDeviceSettings = false;
         private VisualizationData Data;
+        private bool VisualizationEnable = false;
         private static readonly string subKey = @"Software\HUlamp Terminal";
 
+        private ColorPicker colorPicker = new ColorPicker();
+
+        private RadioButton[] ModeRadioButtonGroup;
 
         private void RxDataActions(object sender, RxMainDataArgs e)
         {
-            String str = "[" + DateTime.Now.ToString("HH:mm:ss.ffff")  + "] Current = " + e.CurrentData.ToString("F3") + " Temperature = " +
+            String str = "[" + DateTime.Now.ToString("HH:mm:ss.ffff") + "] Current = " + e.CurrentData.ToString("F3") + " Temperature = " +
                 e.TemperatureData.ToString("F1") + " " + Convert.ToString(e.ButtonData) + " " + e.VoltageData.ToString("F1") + "\r\n";
             if (receiveTextBox.Lines.Length < 100)
             {
@@ -94,6 +83,16 @@ namespace HUlamp
             else
             {
                 DeviceSettings = e;
+                ModeRadioButtonGroup[DeviceSettings.BacklightMode].Checked = true;
+                float colMax = Math.Max(DeviceSettings.BacklightRed, Math.Max(DeviceSettings.BacklightGreen, DeviceSettings.BacklightBlue));
+                byte r = (byte)(DeviceSettings.BacklightRed / colMax * 255f + 0.5f);
+                byte g = (byte)(DeviceSettings.BacklightGreen / colMax * 255f + 0.5f);
+                byte b = (byte)(DeviceSettings.BacklightBlue / colMax * 255f + 0.5f);
+                Color cl = Color.FromArgb(r, g, b);
+                nsColorPanel.BackColor = cl;
+                nsBacklightStateCB.Checked = Convert.ToBoolean(DeviceSettings.LEDState);
+                nsTransmitterStateCB.Checked = Convert.ToBoolean(DeviceSettings.ETXMode);
+                nsBacklightTB.Value = (int)(DeviceSettings.BrightnessMultiplier * 100f + 0.5f);
             }
         }
 
@@ -137,6 +136,12 @@ namespace HUlamp
                 {
                     serialPort.PortName = (string)comportBox.SelectedItem;
                     serialPort.Open();
+                    if (serialPort.IsOpen)
+                    {
+                        ShowDeviceSettings = false;
+                        byte[] array = SendCommandList.RequestAltData();
+                        serialPort.Write(array, 0, (int)array.Length);
+                    }
                     //Buffer = new RxBuffer(2048, RxDataActions, RxAltDataActions);
                     RegistryKey key = Registry.CurrentUser.CreateSubKey(subKey);
                     key?.SetValue("SerialPort", (string)comportBox.SelectedItem);
@@ -185,8 +190,8 @@ namespace HUlamp
 
         private void ReceiveTextBox_TextChanged(object sender, EventArgs e)
         {
-            
-            
+
+
         }
 
         private void CommanSentB_Click(object sender, EventArgs e)
@@ -268,7 +273,7 @@ namespace HUlamp
                             binWriter.Write((byte)0x2D);
                             binWriter.Write((byte)0x62);
                             binWriter.Write((byte)0x6D);
-                            binWriter.Write(Convert.ToSingle(textboxParam1.Text));
+                            binWriter.Write(textboxParam1.Text.ToFloat());
                             serialPort.Write(stream.ToArray(), 0, (int)stream.Length);
                         }
                     }
@@ -341,20 +346,21 @@ namespace HUlamp
                 timerVolumeUpdate.AutoReset = true;
                 timerVolumeUpdate.Elapsed += new System.Timers.ElapsedEventHandler(TimerVolumeUpdate_Tick);
             }
-            if (!timer.Enabled)
+            if (!timer.Enabled) //определение выключено ли
             {
                 enumerator = new MMDeviceEnumerator();
                 if (serialPort.IsOpen)
                 {
                     try
                     {
-                        ShowDeviceSettings = false;
-                        byte[] array = SendCommandList.RequestAltData();
+                        //ShowDeviceSettings = false;
+                        //byte[] array = SendCommandList.RequestAltData();
+                        //serialPort.Write(array, 0, (int)array.Length);
+                        //Thread.Sleep(200);
+                        byte[] array = SendCommandList.SetBrightnessCommand(1);
                         serialPort.Write(array, 0, (int)array.Length);
-                        Thread.Sleep(200);
+                        Thread.Sleep(1);
                         array = SendCommandList.ChangeBacklightModeCommand(0);
-                        serialPort.Write(array, 0, (int)array.Length);
-                        array = SendCommandList.SetBrightnessCommand(1);
                         serialPort.Write(array, 0, (int)array.Length);
                     }
                     catch { errorCount++; }
@@ -372,6 +378,10 @@ namespace HUlamp
                 timerVolumeUpdate.Enabled = true;
                 VisualizationOnButton.Text = "Выключить";
                 bufferTrackBar.Enabled = false;
+                VisualizationEnable = true;
+                nsVisualizationOnCB.CheckedChanged -= nsVisualizationOnCB_CheckedChanged;
+                nsVisualizationOnCB.Checked = true;
+                nsVisualizationOnCB.CheckedChanged += nsVisualizationOnCB_CheckedChanged;
             }
             else
             {
@@ -398,252 +408,11 @@ namespace HUlamp
                 Recorder.StopRecording();
                 VisualizationOnButton.Text = "Включить";
                 bufferTrackBar.Enabled = true;
+                VisualizationEnable = false;
+                nsVisualizationOnCB.CheckedChanged -= nsVisualizationOnCB_CheckedChanged;
+                nsVisualizationOnCB.Checked = false;
+                nsVisualizationOnCB.CheckedChanged += nsVisualizationOnCB_CheckedChanged;
             }
-        }
-
-        private void TimerVolumeUpdate_Tick(object sender, ElapsedEventArgs e)
-        {
-            Data.LastValue[3] = Data.Value[3];
-            Data.Value[3] = Data.ColourDefault[3];
-            MMDevice adev = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
-            float volume = adev.AudioMeterInformation.MasterPeakValue;
-            Data.Value[Data.ColourLink[3]] += volume * Data.Coefficient[3];
-
-            if (Data.AutoVolumeEnable)
-            {
-                float mv = adev.AudioEndpointVolume.MasterVolumeLevel;
-                if (mv != systemVolume)
-                {
-                    systemVolume = adev.AudioEndpointVolume.MasterVolumeLevel;
-                    maxVolume = 0;
-                    belowMaxVolumeCounter = Data.AutoVolumeCounterMax;
-                }
-                if ((volume > 0.000001) && (belowMaxVolumeCounter > 0)) belowMaxVolumeCounter--;
-                if (volume >= belowMaxVolumeValue) belowMaxVolumeCounter = Data.AutoVolumeCounterMax;
-
-                if (belowMaxVolumeCounter == 0)
-                {
-                    maxVolume = belowMaxVolumeValue;
-                    belowMaxVolumeValue = maxVolume * (float)(1d - Data.AutoVolumeMulHysteresis);
-                    belowMaxVolumeCounter = -1000;
-                }
-                else if (belowMaxVolumeCounter < -1)
-                {
-                    maxVolume *= 0.99f;
-                    belowMaxVolumeValue = maxVolume;
-                    belowMaxVolumeCounter++;
-                }
-                else if (belowMaxVolumeCounter == -1)
-                {
-                    belowMaxVolumeCounter = Data.AutoVolumeCounterMax;
-                }
-
-                if (maxVolume < volume)
-                {
-                    maxVolume = volume;
-                    belowMaxVolumeValue = volume * (float)(1d - Data.AutoVolumeMulHysteresis);
-                    belowMaxVolumeCounter = Data.AutoVolumeCounterMax;
-                }
-                if (maxVolume != 0) Data.Value[Data.ColourLink[3]] *= Data.AutoVolumeTarget / maxVolume;
-            }
-
-            if (Data.Value[3] > 10) Data.Value[3] = 10;
-
-            double div = ((double)(timer.Interval) / (double)(timerVolumeUpdate.Interval) * (double)Data.IntervalMultiplier);
-            double st1 = (Data.Value[3] - Data.CurrentValue[3]) / div;
-            double st2 = (Data.Value[3] - Data.LastValue[3]) / div;
-            Data.Step[3] = (Math.Abs(st1) > Math.Abs(st2)) ? st1 : st2;
-            Data.StepValueLimit[3] = Data.Value[3] + Data.Step[3] * div;
-            if (Data.Step[3] > Data.RiseMaxStep[3]) Data.Step[3] = Data.RiseMaxStep[3];
-            else if (Data.Step[3] < -Data.FallMaxStep[3]) Data.Step[3] = -Data.FallMaxStep[3];
-
-        }
-
-        private void FFTTimerCallback()
-        {
-            Array.Copy(Data.Value.Value, Data.LastValue, Data.LastValue.Length - 1);
-            Array.Copy(Data.ColourDefault, Data.Value.Value, Data.ColourDefault.Length - 1);
-            if (!PlotLatestData1())
-            {
-                Array.Copy(Data.LastValue, Data.Value.Value, 3);
-            }
-            int posMax = 0;
-            for (int i = 0; i < 3; i++)
-            {
-                if (Data.Value[posMax] < Data.Value[i]) posMax = i;
-            }
-            for (int i = 0; i < 3; i++)
-            {
-                Data.Value[i] *= (i == posMax) ? Data.LeaderMul[i] : Data.FollowerMul[i];
-            }
-
-            for (int i = 0; i < 3; i++) if (Data.Value[i] < 0) Data.Value[i] = 0;
-
-            if (statisticCheckBox.Checked)
-            {
-                statLab1.Invoke(new Action(() => statLab1.Text = Data.Value[0].ToString("F1")));
-                statLab2.Invoke(new Action(() => statLab2.Text = Data.Value[1].ToString("F1")));
-                statLab3.Invoke(new Action(() => statLab3.Text = Data.Value[2].ToString("F1")));
-                statLab4.Invoke(new Action(() => statLab4.Text = Data.Value[3].ToString("F2")));
-                statLab5.Invoke(new Action(() => statLab5.Text = Data.Value.Max[0].ToString("F1")));
-                statLab6.Invoke(new Action(() => statLab6.Text = Data.Value.Max[1].ToString("F1")));
-                statLab7.Invoke(new Action(() => statLab7.Text = Data.Value.Max[2].ToString("F1")));
-                statLab8.Invoke(new Action(() => statLab8.Text = Data.Value.Max[3].ToString("F2")));
-                statLab9.Invoke(new Action(() => statLab9.Text = Data.CurrentValue[0].ToString("F1")));
-                statLab10.Invoke(new Action(() => statLab10.Text = Data.CurrentValue[1].ToString("F1")));
-                statLab11.Invoke(new Action(() => statLab11.Text = Data.CurrentValue[2].ToString("F1")));
-                statLab2.Invoke(new Action(() => statLab12.Text = Data.CurrentValue[3].ToString("F2")));
-            }
-
-            double sum = Data.Value[0] + Data.Value[1] + Data.Value[2];
-            double mul = sum / Data.Value[posMax];
-            for (int i = 0; i < 3; i++)
-            {
-                Data.Value[i] = Data.Value[i] / sum * 200 * mul;
-            }
-
-            double st1 = 0, st2 = 0;
-            for (int i = 0; i < 3; i++)
-            {
-                double div = ((double)(timer.Interval) / (double)(timerLEDUpdate.Interval) * (double)Data.IntervalMultiplier);
-                st1 = (Data.Value[i] - Data.CurrentValue[i]) / div;
-                st2 = (Data.Value[i] - Data.LastValue[i]) / div;
-                Data.Step[i] = (Math.Abs(st1) > Math.Abs(st2)) ? st1 : st2;
-                Data.StepValueLimit[i] = Data.Value[i] + Data.Step[i] * div;
-                if (Data.Step[i] > Data.RiseMaxStep[i]) Data.Step[i] = Data.RiseMaxStep[i];
-                else if (Data.Step[i] < -Data.FallMaxStep[i]) Data.Step[i] = -Data.FallMaxStep[i];
-            }
-        }
-
-        private void Timer_Tick(object sender, ElapsedEventArgs e)
-        {
-            FFTTimerCallback();
-        }
-
-
-        public double[] FFT(double[] data)
-        {
-            System.Numerics.Complex[] fftComplex = new System.Numerics.Complex[data.Length];
-            System.Numerics.Complex[] output = new Complex[data.Length];
-            for (int i = 0; i < data.Length; i++) fftComplex[i] = data[i];
-            var pinIn = new PinnedArray<Complex>(fftComplex);
-            var pinOut = new PinnedArray<Complex>(output);
-            DFT.FFT(pinIn, pinOut);
-            for (int i = 0; i < data.Length; i++)
-                data[i] = pinOut[i].Magnitude;
-            pinIn.Dispose();
-            pinOut.Dispose();
-            return data;
-        }
-
-        private bool PlotLatestData1()
-        {
-            double[] fvmaxl = new double[3];
-            double[] fvmaxm = new double[6];
-            double[] fvmaxh = new double[6];
-
-            byte[] audioBytes = Recorder.StreamData;
-
-            int graphPointCount = audioBytes.Length / 2;
-
-            double[] fft = new double[graphPointCount];
-
-            for (int i = 0; i < graphPointCount; i++)
-            {
-                Int16 val = BitConverter.ToInt16(audioBytes, i * 2);
-                fft[i] = (double)(val) / 65536.0;
-            }
-            fft = FFT(fft);
-
-            Array.Clear(fvmaxl, 0, fvmaxl.Length);
-            Array.Clear(fvmaxm, 0, fvmaxm.Length);
-            Array.Clear(fvmaxh, 0, fvmaxh.Length);
-
-            int mil = (int)(Data.Frequency[0] / ((float)SampleRate / (float)((int)graphPointCount / (int)4)));
-            for (int i = 0; i <= mil; i++)
-            {
-                for (int j = 0; j < Math.Min(mil, fvmaxl.Length); j++)
-                    if (fvmaxl[j] < fft[i])
-                    {
-                        Array.Sort(fvmaxl, (x, y) => -x.CompareTo(y));
-                        Array.Copy(fvmaxl, j, fvmaxl, j + 1, Math.Min(mil, fvmaxl.Length) - j - 1);
-                        fvmaxl[j] = fft[i];
-                        break;
-                    }
-            }
-            double v = 0;
-            for (int i = 0; i < Math.Min(mil, fvmaxl.Length); i++) v += fvmaxl[i];
-            Data.Value[Data.ColourLink[0]] += Data.Coefficient[0] * (v) / Math.Min(mil, fvmaxl.Length) / 20.0;
-
-            int mim = (int)(Data.Frequency[1] / ((float)SampleRate / (float)(graphPointCount / 4)));
-            for (int i = mil + 1; i <= mim; i++)
-            {
-                for (int j = 0; j < Math.Min(mim - mil, fvmaxm.Length); j++)
-                    if (fvmaxm[j] < fft[i])
-                    {
-                        Array.Sort(fvmaxm, (x, y) => -x.CompareTo(y));
-                        Array.Copy(fvmaxm, j, fvmaxm, j + 1, Math.Min(mim - mil, fvmaxm.Length) - j - 1);
-                        fvmaxm[j] = fft[i];
-                        break;
-                    }
-            }
-            v = 0;
-            for (int i = 0; i < Math.Min(mim, fvmaxm.Length); i++) v += fvmaxm[i];
-            Data.Value[Data.ColourLink[1]] += Data.Coefficient[1] * (v) / Math.Min(mim, fvmaxm.Length) / 20.0;
-
-            int mih = (int)(Data.Frequency[2] / ((float)SampleRate / (float)(graphPointCount / 4)));
-            for (int i = mim + 1; i <= mih; i++)
-            {
-                for (int j = 0; j < Math.Min(mih - mim, fvmaxh.Length); j++)
-                    if (fvmaxh[j] < fft[i])
-                    {
-                        Array.Sort(fvmaxh, (x, y) => -x.CompareTo(y));
-                        Array.Copy(fvmaxh, j, fvmaxh, j + 1, Math.Min(mih - mim, fvmaxh.Length) - j - 1);
-                        fvmaxh[j] = fft[i];
-                        break;
-                    }
-            }
-            v = 0;
-            for (int i = 0; i < Math.Min(mih, fvmaxh.Length); i++) v += fvmaxh[i];
-            Data.Value[Data.ColourLink[2]] += Data.Coefficient[2] * (v) / Math.Min(mih, fvmaxh.Length) / 20.0;
-            return true;
-        }
-
-        private void TimerLEDUpdate_Tick(object sender, ElapsedEventArgs e)
-        {
-            float[] rgb = new float[3];
-            int k = Thread.CurrentThread.ManagedThreadId;
-            double vol = Data.CurrentValue[3] + Data.Step[3];
-
-            if (vol < 0) vol = 0;
-            if (!Data.AutoVolumeEnable) vol *= Data.BrightnessMul;
-            if ((Data.Step[3] >= 0 && vol > Data.StepValueLimit[3]) || (Data.Step[3] < 0 && vol < Data.StepValueLimit[3])) vol = Data.StepValueLimit[3];
-            if (vol > 10) vol = 10;
-            Data.CurrentValue[3] = vol;
-
-            double v;
-            for (int i = 0; i < 3; i++)
-            {
-                v = Data.CurrentValue[i];
-                v += Data.Step[i];
-                if (v < 0) v = 0;
-                if ((Data.Step[i] >= 0 && v > Data.StepValueLimit[i]) || (Data.Step[i] < 0 && v < Data.StepValueLimit[i])) v = Data.StepValueLimit[i];
-                if (v > 200) v = 200;
-                if (v < 0) v = 0;
-                Data.CurrentValue[i] = v;
-                //v *= Data.RGBMul;
-                rgb[i] = (float)v;
-            }
-            if (serialPort.IsOpen)
-            {
-                byte[] array = SendCommandList.SetColourCommand(rgb[0] * (float)vol, rgb[1] * (float)vol, rgb[2] * (float)vol);
-                try
-                {
-                    serialPort.Write(array, 0, array.Length);
-                }
-                catch { errorCount++; };
-            }
-
         }
 
         private void MainForm_Resize(object sender, EventArgs e)
@@ -660,7 +429,7 @@ namespace HUlamp
             double v = (double)brightnessTrackBar.Value;
             v = v * v / 2500;
             brightnessTrackBarLabel.Text = v.ToString("F2");
-            Data.BrightnessMul =  v;
+            Data.BrightnessMul = v;
         }
 
         private void LoadVisualizationPreset(VisualizationData data)
@@ -707,6 +476,21 @@ namespace HUlamp
             textBoxAutoVolStep.Text = data.AutoVolumeMulHysteresis.ToString();
             brightnessTrackBar.Value = data.VolumeTrack;
             autoEnableVisCB.Checked = data.VisualizationEnable;
+            textBoxVolPow.Text = data.VolumePowerValue.ToString();
+
+            nsVisualizationVolumeTB.ValueChanged -= nsVisualizationVolumeTB_ValueChanged;
+            nsVisualizationOnCB.CheckedChanged -= nsVisualizationOnCB_CheckedChanged;
+            nsVisualizationAutoVol.CheckedChanged -= nsVisualizationAutoVol_CheckedChanged;
+            nsVisualizationStartOn.CheckedChanged -= nsVisualizationStartOn_CheckedChanged;
+            nsVisualizationVolumeTB.Value = Convert.ToInt32(data.AutoVolumeTarget * 100d + 0.5);
+            nsVisualizationOnCB.Checked = VisualizationEnable;
+            nsVisualizationAutoVol.Checked = data.AutoVolumeEnable;
+            nsVisualizationStartOn.Checked = data.VisualizationEnable;
+            nsVisualizationVolumeTB.ValueChanged += nsVisualizationVolumeTB_ValueChanged;
+            nsVisualizationOnCB.CheckedChanged += nsVisualizationOnCB_CheckedChanged;
+            nsVisualizationAutoVol.CheckedChanged += nsVisualizationAutoVol_CheckedChanged;
+            nsVisualizationStartOn.CheckedChanged += nsVisualizationStartOn_CheckedChanged;
+            nsVisualizationVolumeTB.Enabled = nsVisualizationAutoVol.Checked;
         }
 
         private void ChangeVisualizationPresetData(VisualizationData data)
@@ -752,15 +536,33 @@ namespace HUlamp
             data.AutoVolumeTarget = textBoxAutoVolTarget.Text.ToDouble();
             data.AutoVolumeCounterMax = textBoxAutoVolCounter.Text.ToInt();
             data.AutoVolumeMulHysteresis = textBoxAutoVolStep.Text.ToDouble();
+            data.VolumePowerValue = textBoxVolPow.Text.ToDouble();
 
             data.VolumeTrack = brightnessTrackBar.Value;
             data.VisualizationEnable = autoEnableVisCB.Checked;
 
+            nsVisualizationVolumeTB.ValueChanged -= nsVisualizationVolumeTB_ValueChanged;
+            nsVisualizationOnCB.CheckedChanged -= nsVisualizationOnCB_CheckedChanged;
+            nsVisualizationAutoVol.CheckedChanged -= nsVisualizationAutoVol_CheckedChanged;
+            nsVisualizationStartOn.CheckedChanged -= nsVisualizationStartOn_CheckedChanged;
+            nsVisualizationVolumeTB.Value = Convert.ToInt32(data.AutoVolumeTarget * 100d + 0.5);
+            nsVisualizationOnCB.Checked = VisualizationEnable;
+            nsVisualizationAutoVol.Checked = data.AutoVolumeEnable;
+            nsVisualizationStartOn.Checked = data.VisualizationEnable;
+            nsVisualizationVolumeTB.ValueChanged += nsVisualizationVolumeTB_ValueChanged;
+            nsVisualizationOnCB.CheckedChanged += nsVisualizationOnCB_CheckedChanged;
+            nsVisualizationAutoVol.CheckedChanged += nsVisualizationAutoVol_CheckedChanged;
+            nsVisualizationStartOn.CheckedChanged += nsVisualizationStartOn_CheckedChanged;
+            nsVisualizationVolumeTB.Enabled = nsVisualizationAutoVol.Checked;
         }
 
         private void tabControl1_Selecting(object sender, TabControlCancelEventArgs e)
         {
-            if (tabControl1.SelectedTab == tabVisualization)
+            if (tabControl.SelectedTab == tabVisualization)
+            {
+                LoadVisualizationPreset(Data);
+            }
+            if (tabControl.SelectedTab == tabFastSettings)
             {
                 LoadVisualizationPreset(Data);
             }
@@ -801,6 +603,7 @@ namespace HUlamp
 
         private void MainForm_Shown(object sender, EventArgs e)
         {
+            ModeRadioButtonGroup = new RadioButton[5] { nsModeRB1, nsModeRB2, nsModeRB3, nsModeRB4, nsModeRB5 };
             Data = new VisualizationData();
             Data.LoadFromRegistry();
             ComportReloadButton_Click(this, new EventArgs());
@@ -819,6 +622,9 @@ namespace HUlamp
                         comportBox.SelectedIndex = 0;
                         serialPort.Open();
                         Buffer = new RxBuffer(2048, RxDataActions, RxAltDataActions);
+                        ShowDeviceSettings = false;
+                        byte[] array = SendCommandList.RequestAltData();
+                        serialPort.Write(array, 0, (int)array.Length);
                     }
                     catch { MessageBox.Show("Не удалось подключиться.", "Error"); }
                 }
@@ -834,6 +640,8 @@ namespace HUlamp
                 Thread.Sleep(100);
                 Button1_Click(this, new EventArgs());
             }
+
+            LoadVisualizationPreset(Data);
         }
 
         private void autoConnectCB_CheckedChanged(object sender, EventArgs e)
@@ -894,7 +702,7 @@ namespace HUlamp
                     break;
 
                 case 4:
-                    label1.Text = "Шаг режима (uint8)";
+                    label1.Text = "Ячейка (uint8)";
                     label2.Text = "Цель ярк. (float)";
                     label3.Text = "Шаг ярк. (float)";
                     label4.Text = "Цель red (float)";
@@ -915,7 +723,7 @@ namespace HUlamp
                         "{5, 10, 200, 20, 200, 0.091, 0, 20},,\r\n{ 5, 10, 0, 0.2, 200, 0.0706, 0, 20}, " +
                         "{ 5, 10, 0, 0.2, 200, 0.0706, 0, 20},\r\n{ 5, 10, 0, 0.2, 0, 0.2, 200, 0.2}, " +
                         "{ 5, 10, 0, 0.2, 0, 0.2, 200, 0.2},\r\n{ 5, 10, 100, 0.1, 0, 0.2, 100, 0.1}, " +
-	                    "{ 5, 10, 100, 0.1, 0, 0.2, 100, 0.1},\r\n");
+                        "{ 5, 10, 100, 0.1, 0, 0.2, 100, 0.1},\r\n");
                     break;
 
                 case 5:
@@ -981,7 +789,43 @@ namespace HUlamp
 
         private void statisticCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            if (statisticCheckBox.Checked) Data.Value.ResetMaxValues();
+            if (statisticCheckBox.Checked)
+            {
+                Data.Value.ResetMaxValues();
+                statLab1.Visible = true;
+                statLab2.Visible = true;
+                statLab3.Visible = true;
+                statLab4.Visible = true;
+                statLab5.Visible = true;
+                statLab6.Visible = true;
+                statLab7.Visible = true;
+                statLab8.Visible = true;
+                statLab9.Visible = true;
+                statLab10.Visible = true;
+                statLab11.Visible = true;
+                statLab12.Visible = true;
+                statLabD1.Visible = true;
+                statLabD2.Visible = true;
+                statLabD3.Visible = true;
+            }
+            else
+            {
+                statLab1.Visible = false;
+                statLab2.Visible = false;
+                statLab3.Visible = false;
+                statLab4.Visible = false;
+                statLab5.Visible = false;
+                statLab6.Visible = false;
+                statLab7.Visible = false;
+                statLab8.Visible = false;
+                statLab9.Visible = false;
+                statLab10.Visible = false;
+                statLab11.Visible = false;
+                statLab12.Visible = false;
+                statLabD1.Visible = false;
+                statLabD2.Visible = false;
+                statLabD3.Visible = false;
+            }
         }
 
         private void bufferTrackBar_ValueChanged(object sender, EventArgs e)
@@ -1006,6 +850,374 @@ namespace HUlamp
             RegistryKey key = Registry.CurrentUser.CreateSubKey(subKey);
             key?.SetValue("Minimize", formMinimizeCB.Checked);
             key?.Close();
+        }
+
+        private void cmAddB_Click(object sender, EventArgs e)
+        {
+            if (cmTreeView.Nodes.Count >= 61) return;
+            //DialogResult dres = colorDialog.ShowDialog();
+            //if (dres == DialogResult.Cancel) return;
+            colorPicker.ShowDialog();
+            if (colorPicker.DialogResult == DialogResult.Cancel) return;
+            int sn = 1;
+            if (cmTreeView.SelectedNode != null) sn = cmTreeView.SelectedNode.Index;
+            Color cl = colorPicker.Color;
+            TreeNode node = new TreeNode(Convert.ToString(cl));
+            node.BackColor = cl;
+            node.Tag = cl;
+            node.ContextMenuStrip = cmListContextMenu;
+            cmTreeView.Nodes.Add(node);
+        }
+
+        private void cmMenuItemChange_Click(object sender, EventArgs e)
+        {
+            if (cmTreeView.SelectedNode == null) return;
+            colorPicker.ShowDialog();
+            if (colorPicker.DialogResult == DialogResult.Cancel) return;
+            TreeNode node = (cmTreeView.SelectedNode == cmTreeView.Nodes[0]) ? cmTreeView.Nodes[cmTreeView.Nodes.Count - 1] : cmTreeView.SelectedNode;
+            node.Tag = colorPicker.Color;
+            node.Text = Convert.ToString(colorPicker.Color);
+            node.BackColor = colorPicker.Color;
+        }
+
+        private void cmMenuItemDelete_Click(object sender, EventArgs e)
+        {
+            if (cmTreeView.SelectedNode == null) return;
+            if (cmTreeView.SelectedNode == cmTreeView.Nodes[0]) cmTreeView.Nodes[cmTreeView.Nodes.Count - 1].Remove();
+            else cmTreeView.SelectedNode.Remove();
+        }
+
+        private void cmMenuItemInsert_Click(object sender, EventArgs e)
+        {
+            if (cmTreeView.Nodes.Count >= 61) return;
+            //DialogResult dres = colorDialog.ShowDialog();
+            colorPicker.ShowDialog();
+            if (colorPicker.DialogResult == DialogResult.Cancel) return;
+            TreeNode node = new TreeNode(Convert.ToString(colorPicker.Color));
+            node.BackColor = colorPicker.Color;
+            node.Tag = colorPicker.Color;
+            node.ContextMenuStrip = cmListContextMenu;
+            cmTreeView.Nodes.Insert(cmTreeView.SelectedNode.Index + 1, node);
+        }
+
+        private void cmMenuItemDuplicate_Click(object sender, EventArgs e)
+        {
+            if (cmTreeView.Nodes.Count >= 61) return;
+            if (cmTreeView.SelectedNode == null) return;
+            Color cl = (cmTreeView.SelectedNode == cmTreeView.Nodes[0]) ? cmTreeView.Nodes[cmTreeView.Nodes.Count - 1].BackColor :
+                cmTreeView.SelectedNode.BackColor;
+            TreeNode node = new TreeNode(Convert.ToString(cl));
+            node.BackColor = cl;
+            node.Tag = cl;
+            node.ContextMenuStrip = cmListContextMenu;
+            cmTreeView.Nodes.Insert(cmTreeView.SelectedNode.Index + 1, node);
+        }
+
+        private void cmChangeB_Click(object sender, EventArgs e)
+        {
+            if (cmTreeView.SelectedNode == null) return;
+            //DialogResult dres = colorDialog.ShowDialog();
+            colorPicker.ShowDialog();
+            if (colorPicker.DialogResult == DialogResult.Cancel) return;
+            cmTreeView.SelectedNode.Tag = colorPicker.Color;
+            cmTreeView.SelectedNode.Text = Convert.ToString(colorPicker.Color);
+            cmTreeView.SelectedNode.BackColor = colorPicker.Color;
+        }
+
+
+        private void cmTreeView_DoubleClick(object sender, EventArgs e)
+        {
+            if (cmTreeView.SelectedNode == null) return;
+            colorPicker.ShowDialog();
+            if (colorPicker.DialogResult == DialogResult.Cancel) return;
+            TreeNode node = (cmTreeView.SelectedNode == cmTreeView.Nodes[0]) ? cmTreeView.Nodes[cmTreeView.Nodes.Count - 1] : cmTreeView.SelectedNode;
+            node.Tag = colorPicker.Color;
+            node.Text = Convert.ToString(colorPicker.Color);
+            node.BackColor = colorPicker.Color;
+        }
+
+        private void cmDeleteSelectedB_Click(object sender, EventArgs e)
+        {
+            for (int i = 1; i < cmTreeView.Nodes.Count; i++)
+            {
+                if (cmTreeView.Nodes[i].Checked) cmTreeView.Nodes[i--].Remove();
+            }
+        }
+
+        private void cmTreeView_AfterCheck(object sender, TreeViewEventArgs e)
+        {
+            if (e.Node == cmTreeView.Nodes[0])
+            {
+                for (int i = 1; i < cmTreeView.Nodes.Count; i++)
+                {
+                    cmTreeView.Nodes[i].Checked = cmTreeView.Nodes[0].Checked;
+                }
+            }
+        }
+
+        private float _alphaConvert(byte value)
+        {
+            float brtMul = cmBrtMultextBox.Text.ToFloat();
+            if ((brtMul > 1) || (brtMul < 0)) brtMul = 1;
+            return ((float)value) / 255f * 10f * brtMul;
+        }
+
+        private float _colorConvert(byte value)
+        {
+            return ((float)value) / 255f * 200f;
+        }
+
+        private float _stepCalculate(float val1, float val2)
+        {
+            return Math.Abs((val2 - val1) / 1000f);
+        }
+
+        private void cmLoadToDeviceB_Click(object sender, EventArgs e)
+        {
+            if (cmTreeView.Nodes.Count <= 1) return;
+            float brt = _alphaConvert(((Color)cmTreeView.Nodes[1].Tag).A);
+            float red = _colorConvert(((Color)cmTreeView.Nodes[1].Tag).R);
+            float green = _colorConvert(((Color)cmTreeView.Nodes[1].Tag).G);
+            float blue = _colorConvert(((Color)cmTreeView.Nodes[1].Tag).B);
+            byte[] array = SendCommandList.CustomModeDataCommand(0, brt, 10f, red, 200f, green, 200f, blue, 200f);
+            serialPort.Write(array, 0, (int)array.Length);
+
+            Thread.Sleep(10);
+            brt = _alphaConvert(((Color)cmTreeView.Nodes[1].Tag).A);
+            red = _colorConvert(((Color)cmTreeView.Nodes[1].Tag).R);
+            green = _colorConvert(((Color)cmTreeView.Nodes[1].Tag).G);
+            blue = _colorConvert(((Color)cmTreeView.Nodes[1].Tag).B);
+            float brtL = _alphaConvert(((Color)cmTreeView.Nodes[cmTreeView.Nodes.Count - 1].Tag).A);
+            float redL = _colorConvert(((Color)cmTreeView.Nodes[cmTreeView.Nodes.Count - 1].Tag).R);
+            float greenL = _colorConvert(((Color)cmTreeView.Nodes[cmTreeView.Nodes.Count - 1].Tag).G);
+            float blueL = _colorConvert(((Color)cmTreeView.Nodes[cmTreeView.Nodes.Count - 1].Tag).B);
+            array = SendCommandList.CustomModeDataCommand((byte)1, brt, _stepCalculate(brtL, brt), red, _stepCalculate(redL, red),
+                green, _stepCalculate(greenL, green), blue, _stepCalculate(blueL, blue));
+            serialPort.Write(array, 0, (int)array.Length);
+            Thread.Sleep(10);
+
+            for (int i = 2; i < cmTreeView.Nodes.Count; i++)
+            {
+                brt = _alphaConvert(((Color)cmTreeView.Nodes[i].Tag).A);
+                red = _colorConvert(((Color)cmTreeView.Nodes[i].Tag).R);
+                green = _colorConvert(((Color)cmTreeView.Nodes[i].Tag).G);
+                blue = _colorConvert(((Color)cmTreeView.Nodes[i].Tag).B);
+                brtL = _alphaConvert(((Color)cmTreeView.Nodes[i - 1].Tag).A);
+                redL = _colorConvert(((Color)cmTreeView.Nodes[i - 1].Tag).R);
+                greenL = _colorConvert(((Color)cmTreeView.Nodes[i - 1].Tag).G);
+                blueL = _colorConvert(((Color)cmTreeView.Nodes[i - 1].Tag).B);
+                array = SendCommandList.CustomModeDataCommand((byte)(i), brt, _stepCalculate(brtL, brt), red, _stepCalculate(redL, red),
+                    green, _stepCalculate(greenL, green), blue, _stepCalculate(blueL, blue));
+                serialPort.Write(array, 0, (int)array.Length);
+                Thread.Sleep(10);
+            }
+
+            array = SendCommandList.CustomModeSetupCommand((byte)(cmTreeView.Nodes.Count - 1));
+            serialPort.Write(array, 0, (int)array.Length);
+            Thread.Sleep(10);
+
+            if (cmSaveCB.Checked)
+            {
+                array = SendCommandList.SaveCommand("10");
+                serialPort.Write(array, 0, (int)array.Length);
+            }
+        }
+
+        private void cmCustomModeOnOffB_Click(object sender, EventArgs e)
+        {
+            if (timer.Enabled)
+            {
+                Button1_Click(this, new EventArgs());
+                Thread.Sleep(5);
+            }
+            byte[] array = SendCommandList.ChangeBacklightModeCommand("2");
+            serialPort.Write(array, 0, (int)array.Length);
+            Thread.Sleep(5);
+            if (cmSaveCB.Checked)
+            {
+                array = SendCommandList.SaveCommand("4");
+                serialPort.Write(array, 0, (int)array.Length);
+            }
+            DeviceSettings.BacklightMode = 2;
+        }
+
+        private void cmTreeView_MouseMove(object sender, MouseEventArgs e)
+        {
+            cmTreeView.SelectedNode = cmTreeView.GetNodeAt(e.Location);
+        }
+
+        private void retryTimer_Tick(object sender, EventArgs e)
+        {
+            if (Recorder != null)
+                if (!Recorder.IsRecording && timer.Enabled)
+                {
+                    AudioFormat = new WaveFormat();
+                    SampleRate = AudioFormat.SampleRate;
+                    Recorder.Dispose();
+                    Recorder = new LoopbackRecorder(Data.BufferSize, true);
+                    Recorder.StartRecording();
+                }
+        }
+
+        private void autoVolumeResB_Click(object sender, EventArgs e)
+        {
+            belowMaxVolumeCounter = -1000;
+        }
+
+        private void nsVisualizationOnCB_CheckedChanged(object sender, EventArgs e)
+        {
+            Button1_Click(this, new EventArgs());
+        }
+
+        private void nsVisualizationStartOn_CheckedChanged(object sender, EventArgs e)
+        {
+            Data.VisualizationEnable = !Data.VisualizationEnable;
+            autoEnableVisCB.Checked = Data.VisualizationEnable;
+            Data.SaveToRegistry();
+        }
+
+        private void nsVisualizationAutoVol_CheckedChanged(object sender, EventArgs e)
+        {
+            Data.AutoVolumeEnable = !Data.AutoVolumeEnable;
+            autoVolumeCheckBox.Checked = Data.AutoVolumeEnable;
+            Data.SaveToRegistry();
+            nsVisualizationVolumeTB.Enabled = nsVisualizationAutoVol.Checked;
+        }
+
+        private void nsVisualizationVolumeTB_ValueChanged(object sender, EventArgs e)
+        {
+            Data.AutoVolumeTarget = (double)nsVisualizationVolumeTB.Value / 100d;
+            textBoxAutoVolTarget.Text = Data.AutoVolumeTarget.ToString();
+            Data.SaveToRegistry();
+        }
+
+        private void nsSetModeB_Click(object sender, EventArgs e)
+        {
+            if (VisualizationEnable)
+            {
+                Button1_Click(this, new EventArgs());
+            }
+            for (int i = 0; i < ModeRadioButtonGroup.Length; i++)
+            {
+                if (ModeRadioButtonGroup[i].Checked)
+                {
+                    if (serialPort.IsOpen)
+                    {
+                        byte[] array = SendCommandList.ChangeBacklightModeCommand((byte)i);
+                        serialPort.Write(array, 0, (int)array.Length);
+                        Thread.Sleep(2);
+                        array = SendCommandList.SaveCommand("4");
+                        serialPort.Write(array, 0, (int)array.Length);
+
+                        DeviceSettings.BacklightMode = (byte)i;
+                        break;
+                    }
+                }
+            }
+
+        }
+
+        private void nsChangeColorB_Click(object sender, EventArgs e)
+        {
+            if (VisualizationEnable)
+            {
+                Button1_Click(this, new EventArgs());
+            }
+            colorPicker.Color = nsColorPanel.BackColor;
+            if (colorPicker.ShowDialog() == DialogResult.OK)
+            {
+                nsColorPanel.BackColor = colorPicker.Color;
+                float r = 0, g = 0, b = 0, a = 0;
+                r = _colorConvert(nsColorPanel.BackColor.R);
+                g = _colorConvert(nsColorPanel.BackColor.G);
+                b = _colorConvert(nsColorPanel.BackColor.B);
+                a = ((float)nsColorPanel.BackColor.A) / 255f * 10f;
+                if (serialPort.IsOpen)
+                {
+                    byte[] array = SendCommandList.SetColourCommand(r, g, b);
+                    serialPort.Write(array, 0, (int)array.Length);
+                    Thread.Sleep(2);
+                    array = SendCommandList.SetBrightnessCommand(a);
+                    serialPort.Write(array, 0, (int)array.Length);
+                    Thread.Sleep(2);
+                    array = SendCommandList.SaveCommand("5");
+                    serialPort.Write(array, 0, (int)array.Length);
+                    Thread.Sleep(2);
+                    array = SendCommandList.SaveCommand("6");
+                    serialPort.Write(array, 0, (int)array.Length);
+                    Thread.Sleep(2);
+                    array = SendCommandList.SaveCommand("7");
+                    serialPort.Write(array, 0, (int)array.Length);
+                    Thread.Sleep(2);
+                    array = SendCommandList.SaveCommand("8");
+                    serialPort.Write(array, 0, (int)array.Length);
+
+                    DeviceSettings.BacklightRed = r;
+                    DeviceSettings.BacklightGreen = g;
+                    DeviceSettings.BacklightBlue = b;
+                    DeviceSettings.BacklightBrightness = a;
+                }
+            }
+        }
+
+        private void nsTransmitterStateCB_CheckedChanged(object sender, EventArgs e)
+        {
+            if (serialPort.IsOpen)
+            {
+                byte[] array = SendCommandList.SetTXControlCommand((nsTransmitterStateCB.Checked) ? "1" : "0");
+                serialPort.Write(array, 0, (int)array.Length);
+                Thread.Sleep(2);
+                array = SendCommandList.SaveCommand("1");
+                serialPort.Write(array, 0, (int)array.Length);
+
+                DeviceSettings.ETXMode = (byte)((nsTransmitterStateCB.Checked) ? 1 : 0);
+            }
+        }
+
+        private void nsBacklightSetB_Click(object sender, EventArgs e)
+        {
+            if (serialPort.IsOpen)
+            {
+                float val = (float)nsBacklightTB.Value / 100f;
+                byte[] array = SendCommandList.SetGlobalBrightnessCommand(val);
+                serialPort.Write(array, 0, (int)array.Length);
+                Thread.Sleep(2);
+                array = SendCommandList.SaveCommand("9");
+                serialPort.Write(array, 0, (int)array.Length);
+
+                DeviceSettings.BrightnessMultiplier = val;
+            }
+        }
+
+        private void nsDataUpdate_Click(object sender, EventArgs e)
+        {
+            bool visualizationState = false;
+            if (VisualizationEnable)
+            {
+                visualizationState = true;
+                Button1_Click(this, new EventArgs());
+            }
+            Thread.Sleep(200);
+            if (serialPort.IsOpen)
+            {
+                ShowDeviceSettings = false;
+                byte[] array = SendCommandList.RequestAltData();
+                serialPort.Write(array, 0, (int)array.Length);
+            }
+            Thread.Sleep(200);
+            if (visualizationState)
+            {
+                Button1_Click(this, new EventArgs());
+            }
+        }
+
+        private void nsDeviceRebootB_Click(object sender, EventArgs e)
+        {
+            if (serialPort.IsOpen)
+            {
+                byte[] array = SendCommandList.ResetCommand();
+                serialPort.Write(array, 0, (int)array.Length);
+            }
         }
     }
 }
